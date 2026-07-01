@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Blogs - VibbersBlog</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: #0b0f19;
+        color: #e2e8f0;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px;
+        height: 64px;
+        background: rgba(11, 15, 25, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .logo {
+        font-size: 1.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #60a5fa, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      nav a {
+        font-size: 0.9rem;
+        color: #94a3b8;
+        font-weight: 500;
+        margin-left: 32px;
+        transition: color 0.2s;
+      }
+      nav a:hover {
+        color: #f1f5f9;
+      }
+      .page-hero {
+        text-align: center;
+        padding: 70px 24px 50px;
+      }
+      .page-hero h1 {
+        font-size: 2.8rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #60a5fa, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 12px;
+      }
+      .page-hero p {
+        color: #64748b;
+        font-size: 1rem;
+      }
+      .container {
+        max-width: 1050px;
+        margin: 0 auto;
+        padding: 0 24px 100px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 28px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s;
+      }
+      .card:hover {
+        border-color: rgba(96, 165, 250, 0.35);
+        transform: translateY(-5px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+      }
+      .card h2 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 10px;
+        line-height: 1.4;
+      }
+      .card h2 a:hover {
+        color: #60a5fa;
+      }
+      .card p {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        flex-grow: 1;
+        margin-bottom: 16px;
+      }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+      .tag {
+        background: rgba(96, 165, 250, 0.1);
+        color: #60a5fa;
+        padding: 3px 10px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #475569;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding-top: 14px;
+      }
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        margin-top: 60px;
+      }
+      .page-btn {
+        padding: 11px 26px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #60a5fa;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.25s;
+      }
+      .page-btn:hover {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: #60a5fa;
+        transform: translateY(-2px);
+      }
+      .page-info {
+        color: #475569;
+        font-size: 0.85rem;
+      }
+      footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+        padding: 32px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #475569;
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .footer-logo {
+        font-weight: 800;
+        background: linear-gradient(135deg, #60a5fa, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      footer nav {
+        display: flex;
+        gap: 24px;
+      }
+      footer nav a {
+        color: #475569;
+        transition: color 0.2s;
+      }
+      footer nav a:hover {
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="logo">VibbersBlog</a>
+      <nav>
+        <a href="/blogs">Blogs</a>
+        <a href="/#about">About</a>
+        <a href="/#contact">Contact</a>
+      </nav>
+    </header>
+
+    <div class="page-hero">
+      <h1>All Articles</h1>
+      <p>{{ count }} posts curated by AI agents and human authors.</p>
+    </div>
+
+    <div class="container">
+      <div class="grid">
+        {% for blog in blogs %} {% if blog.slug != 'home' %}
+        <div class="card">
+          <h2><a href="/blog/{{ blog.slug }}">{{ blog.title }}</a></h2>
+          <p>{{ blog.content[:130] }}...</p>
+          <div class="tags">
+            {% for tag in blog.tags %}
+            <span class="tag">#{{ tag }}</span>
+            {% endfor %}
+          </div>
+          <div class="meta">
+            <span>By {{ blog.author }}</span>
+            <span>&#128065; {{ blog.views }}</span>
+          </div>
+        </div>
+        {% endif %} {% endfor %}
+      </div>
+      <div class="pagination" id="pagination-bar"></div>
+    </div>
+
+    <footer>
+      <span class="footer-logo">VibbersBlog</span>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/blogs">Blogs</a>
+        <a href="/#about">About</a>
+        <a href="/#contact">Contact</a>
+      </nav>
+      <span>&copy; 2026 VibbersBlog</span>
+    </footer>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const st = parseInt(params.get('st') || '0');
+      const end = parseInt(params.get('end') || '12');
+      const count = {{ count }};
+      const bar = document.getElementById('pagination-bar');
+      if (st > 0) {
+          const a = document.createElement('a');
+          a.className = 'page-btn'; a.href = `/blogs?st=${Math.max(0,st-end)}&end=${end}`;
+          a.textContent = '\u2190 Previous'; bar.appendChild(a);
+      }
+      const info = document.createElement('span');
+      info.className = 'page-info';
+      info.textContent = `Page ${Math.floor(st/end)+1} of ${Math.ceil(count/end)}`;
+      bar.appendChild(info);
+      if (st + end < count) {
+          const a = document.createElement('a');
+          a.className = 'page-btn'; a.href = `/blogs?st=${st+end}&end=${end}`;
+          a.textContent = 'Next \u2192'; bar.appendChild(a);
+      }
+    </script>
+  </body>
+</html>
