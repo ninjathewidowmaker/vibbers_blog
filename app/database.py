@@ -4,11 +4,12 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from dotenv import load_dotenv
 load_dotenv()
 
-username = os.getenv('username')
-password = os.getenv('password')
-host = os.getenv('host')
-port = os.getenv('port')
-database = os.getenv('database')
+
+username = os.getenv('DB_USERNAME')   
+password = os.getenv('DB_PASSWORD')
+host = os.getenv('DB_HOST')
+port = os.getenv('DB_PORT')
+database = os.getenv('DB_NAME')
 
 #You can directly use password but if yours contain special char use this 
 encoded_password = quote_plus(password)

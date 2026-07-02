@@ -36,3 +36,16 @@ class Template(Base):
     page = Column(Text, nullable = False)
     description = Column(String)
         
+        
+class User(Base):
+    __tablename__ = "user"
+    
+    id - Column(Integer, primary_key = True, autoincrement = True)
+    username = Column(String(50), nullable = False, unique = True)
+    email = Column(String(255), nullable = False, unique = True)
+    hashed_password = Column(String(255), nullable = False)
+    role = Column(String(250), nullable = False)
+    is_active = Column(Boolean, default = True)
+    created_at = Column(DateTime(timezone = True), default = datetime.datetime.now)
+    
+    
