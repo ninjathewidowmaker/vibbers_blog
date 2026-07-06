@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 import models
 import asyncio
 from sqlalchemy import func
+import auth
 #from temp_cache import template_cache
 #from main import temp_cache
 #from main import template_cache
@@ -218,7 +219,7 @@ async def get_blog_with_names(db: AsyncSession = Depends(get_db)):
     return answer
 
 #IDK if this is how professionals do it? I'm just trying to do my own thing later review the code with Claude or gemini
-async def get_hashed_pass(username, db:AsyncSession = Depends(get_db)):
+async def get_hashed_password(username, db:AsyncSession = Depends(get_db)):
     '''Give a username and return a hashpassword. This is a helper function for helfun's verify_user.'''
     query = select(models.User.hashed_password).where(models.User.username == username)
     
@@ -227,13 +228,44 @@ async def get_hashed_pass(username, db:AsyncSession = Depends(get_db)):
     
     return user_details
 
-'''So I have to make a function which will verify the username and password and gives a goood to go signal for user to login'''
+#I have to make a function which will verify the username and password and gives a goood to go signal for user to login'
 async def verify_user(payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
     '''Get user_details and verify if the details are valid or not. NEXT: check if user has a access token, if yes
     then pass or force to login or maybe just add this if yes or no in the main.py itself.'''
+    username = payload.username
+    password = payload.password
+    query = (select(models.User.username, models.User.hashed_password)
+    .where(models.User.username == username, models.User.is_active == True))
     
-    return ""
+    result = await db.execute(query)
+    user_details = result.one_or_none()
+    if user_details is None:
+        return "No user with above information is available"
+    
+    if not auth.verify_password(password, user_details[password]):       
+        return "User is not verified"
+    
+    return "Success User is verified"
 
+async def create_user(payload:schemas.CreateUser, db: AsyncSession = Depends(get_db)):
+    '''takes user_details and returns Success message thumps up'''
+    password = payload.hashed_password
+    hash_pass = auth.get_hash_pswd(password)
+    
+    user_data = models.User(
+        username = payload.username,
+        hashed_password = hash_pass,
+        email = payload.email,
+        role = 'view'        
+    )
+    
+    db.add(user_data)
+    await db.commit()
+    await db.refresh(user_data)
+    
+    return f"User has been successfully created with id {user_data.id}"
+        
+    
 
 
 

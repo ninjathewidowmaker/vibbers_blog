@@ -195,3 +195,13 @@ async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):
   
     
     return HTMLResponse(content=rendered_content)
+
+
+
+#user creation
+@app.post("/create_user")
+async def create_user(payload: schemas.CreateUser, db: AsyncSession = Depends(get_db)):
+    
+    run = await helfun.create_user(payload,db)
+    
+    return run

@@ -77,8 +77,8 @@ class CountBlog(BaseModel):
     
 class CreateUser(BaseModel):
     username: str
-    name: str
-    password: str
+    hashed_password: str
+    email: str
     role: str = 'view'
     
 
