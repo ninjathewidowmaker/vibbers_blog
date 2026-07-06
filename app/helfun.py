@@ -234,15 +234,17 @@ async def verify_user(payload:schemas.VerifyUser, db: AsyncSession = Depends(get
     then pass or force to login or maybe just add this if yes or no in the main.py itself.'''
     username = payload.username
     password = payload.password
-    query = (select(models.User.username, models.User.hashed_password)
+    query = (select(models.User.hashed_password)
     .where(models.User.username == username, models.User.is_active == True))
     
     result = await db.execute(query)
-    user_details = result.one_or_none()
+    user_details = result.scalar()
     if user_details is None:
         return "No user with above information is available"
     
-    if not auth.verify_password(password, user_details[password]):       
+    hashed_password = user_details
+    
+    if not auth.verify_password(password, hashed_password):       
         return "User is not verified"
     
     return "Success User is verified"

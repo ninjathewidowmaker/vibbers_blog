@@ -205,3 +205,8 @@ async def create_user(payload: schemas.CreateUser, db: AsyncSession = Depends(ge
     run = await helfun.create_user(payload,db)
     
     return run
+
+@app.put("/login")
+async def verify_login(payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
+    
+    return await helfun.verify_user(payload,db)
