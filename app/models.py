@@ -38,13 +38,25 @@ class Template(Base):
         
         
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
     
-    id - Column(Integer, primary_key = True, autoincrement = True)
-    username = Column(String(50), nullable = False, unique = True)
+    id = Column(Integer, primary_key =True, autoincrement = True)
+    username = Column(String(50), nullable = False, unique = True) #Yes no name, just username.
     email = Column(String(255), nullable = False, unique = True)
     hashed_password = Column(String(255), nullable = False)
-    role = Column(String(250), nullable = False)
+    role = Column(String(50), nullable = False)
+    is_active = Column(Boolean, default = True)
+    created_at = Column(DateTime(timezone = True), default = datetime.datetime.now)
+    
+    
+class APITable(Base):
+    __tablename__ = "api_table"
+    
+    id = Column(Integer, primary_key = True, autoincrement=True)
+    label = Column(String(100),nullable= False )
+    user_id = Column(Integer,nullable=False)
+    hash_key = Column(String(255), unique = True, nullable=False,index=True)
+    role = Column(String(50), nullable = False)
     is_active = Column(Boolean, default = True)
     created_at = Column(DateTime(timezone = True), default = datetime.datetime.now)
     

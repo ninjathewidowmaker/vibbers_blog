@@ -74,10 +74,50 @@ class CountBlog(BaseModel):
     
     
     
+    
+class CreateUser(BaseModel):
+    username: str
+    name: str
+    password: str
+    role: str = 'view'
+    
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    disabled: bool | None = None
+
+
+class VerifyUser(BaseModel):
+    username: str
+    password: str
+    email: Optional[str] = None
+
+class UserInDB(User):
+    hashed_password: str    
+    
+        
+    
+    
+    
+    
+    
+    
 #For futute use    
 class CountTemplate(BaseModel):
     count: int
     templates: List[TemplateResponse]    
+    
+    
     
    
     

@@ -217,6 +217,31 @@ async def get_blog_with_names(db: AsyncSession = Depends(get_db)):
     
     return answer
 
+#IDK if this is how professionals do it? I'm just trying to do my own thing later review the code with Claude or gemini
+async def get_hashed_pass(username, db:AsyncSession = Depends(get_db)):
+    '''Give a username and return a hashpassword. This is a helper function for helfun's verify_user.'''
+    query = select(models.User.hashed_password).where(models.User.username == username)
+    
+    result = await db.execute(query)
+    user_details = result.scalar_one_or_none()
+    
+    return user_details
+
+'''So I have to make a function which will verify the username and password and gives a goood to go signal for user to login'''
+async def verify_user(payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
+    '''Get user_details and verify if the details are valid or not. NEXT: check if user has a access token, if yes
+    then pass or force to login or maybe just add this if yes or no in the main.py itself.'''
+    
+    return ""
+
+
+
+
+
+
+
+
+
 
 
 #Done with this application no noticable bugs here might need a few more funs in future
