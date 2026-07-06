@@ -45,7 +45,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return encoded_jwt
 
 user_details = {
-    'username' : 'balu',
+    'username' : 'niNjAtHeWiDoWmAkEr96',
     'role' : 'admin'
 }
 
