@@ -268,6 +268,8 @@ async def create_user(payload:schemas.CreateUser, db: AsyncSession = Depends(get
     return f"User has been successfully created with id {user_data.id}"
         
     
+#now jwt
+    
 
 
 
