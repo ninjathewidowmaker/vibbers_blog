@@ -33,21 +33,34 @@ def verify_password(plain_password, hashed_password):
 #JWT related 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """
+    Send data get a JWT token
     """
     to_encode = data.copy()
 
     expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expires_delta or timedelta(days=int(ACCESS_TOKEN_EXPIRE_MINUTES))
     )
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
 
-user_details = {
-    'username' : 'niNjAtHeWiDoWmAkEr96',
-    'role' : 'admin'
-}
 
-token = create_access_token(user_details, expires_delta=timedelta(minutes=60))
-print(token)
+
+def verify_access_token(token):
+    "Pass the JWT token to check if the token is valid or not"
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    
+    return payload
+
+#user_details = {
+#    'username' : 'niNjAtHeWiDoWmAkEr96',
+#    'role' : 'mega_admin'
+#}
+#
+#token = create_access_token(user_details, expires_delta=timedelta(minutes=60))
+#print(token)
+#confirm = verify_access_token(token)
+#print(confirm)
+
+#Auth.py is done maybe? Now I need two to implement them in the browser with a cookie

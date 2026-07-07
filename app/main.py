@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
@@ -13,6 +13,7 @@ from database import get_db,  AsyncSessionLocal
 import models
 import schemas
 import helfun
+import auth
 #from temp_cache import template_cache
 
 
@@ -173,6 +174,7 @@ async def get_templates(st: int, end:int,db:  AsyncSession = Depends(get_db)):
 
 @app.get("/{slug}")
 async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):
+    '''The twister page. Instead of blogs you can have resume, about page, contacts and anything, sky is the limit'''
     
     query = select(models.Blog).where(models.Blog.is_blog==False, models.Blog.slug==slug)
     
@@ -207,6 +209,21 @@ async def create_user(payload: schemas.CreateUser, db: AsyncSession = Depends(ge
     return run
 
 @app.put("/login")
-async def verify_login(payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
+async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
+    '''Login and automatically creates a token and a session id'''
+    
+    jama = schemas.TokenData(**payload.model_dump())
+    
+    gama = auth.create_access_token(jama.model_dump())
+    
+    response.set_cookie(
+        key='user_access',
+        value=gama,
+        httponly=True,    
+        secure=True,     
+        samesite="lax",  
+        max_age=1800     
+    )
     
     return await helfun.verify_user(payload,db)
+

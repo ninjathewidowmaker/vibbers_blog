@@ -3,7 +3,7 @@ from sqlalchemy import select, update, delete
 #from typing import List, Annotated, Optional
 from database import get_db, AsyncSessionLocal
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
+from fastapi import Depends, Cookie, Response, Request
 from sqlalchemy.orm import Session
 import models
 import asyncio
@@ -267,6 +267,14 @@ async def create_user(payload:schemas.CreateUser, db: AsyncSession = Depends(get
     
     return f"User has been successfully created with id {user_data.id}"
         
+        
+async def cookie_get_verify(request: Request, db: AsyncSession = Depends(get_db)):
+    '''Get token from cookie and verify it.'''
+    token = request.cookies.get("user_access")
+    
+    verify = auth.verify_access_token(token)
+    
+    return verify
     
 #now jwt
     
