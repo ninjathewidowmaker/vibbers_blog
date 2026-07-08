@@ -49,9 +49,12 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 def verify_access_token(token):
     "Pass the JWT token to check if the token is valid or not"
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except:
+        return None
     
-    return payload
 
 #user_details = {
 #    'username' : 'niNjAtHeWiDoWmAkEr96',

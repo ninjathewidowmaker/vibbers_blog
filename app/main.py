@@ -50,12 +50,19 @@ app = FastAPI(lifespan=lifespan)
 
 
 
-
+@app.get("/is_token_verified")
+async def token_verify_satisfaction_watch(request: Request, db:AsyncSession = Depends(get_db)):
+    '''Just to verify if the token is valid or not(No real use just for satisfaction)'''
+    satisfy = await helfun.cookie_get_verify(request,db)
+    
+    return satisfy
     
 
 
 @app.post("/blogs/create")
-async def create_new_blog(payload: schemas.BlogCreate, db: AsyncSession = Depends(get_db)):
+async def create_new_blog(payload: schemas.BlogCreate, 
+    current_user: models.User = Depends(helfun.cookie_get_verify),
+    db: AsyncSession = Depends(get_db)):
     '''Uses helper function grom helfun to create a new blog post. Currently there is no page available
     to edit/change blogs on frontend like most of the CMS/blog sites give the option to. Because to do that
     I need to add auth/security users and passwords which is a pain in the ass I'll let it slide for now'''
@@ -111,13 +118,15 @@ async def update_views(slug:str,views:int, db: AsyncSession):
     return ""
 
 @app.put("/blogs/update/{slug}")
-async def Update_blog(slug:str, payload: schemas.BlogUpdate, db: AsyncSession = Depends(get_db)):
+async def Update_blog(slug:str, payload: schemas.BlogUpdate,current_user: models.User = Depends(helfun.cookie_get_verify), db: AsyncSession = Depends(get_db)):
     
     return await helfun.edit_blogs(slug=slug, payload=payload, db=db)
     
 
 @app.delete("/blogs/delete/{slug}")
-async def delete_blog(slug:str, db : AsyncSession = Depends(get_db)):
+async def delete_blog(slug:str, 
+    current_user: models.User = Depends(helfun.cookie_get_verify),                  
+    db : AsyncSession = Depends(get_db)):
     
     return await helfun.del_blog(slug,db)
 
@@ -172,6 +181,39 @@ async def get_templates(st: int, end:int,db:  AsyncSession = Depends(get_db)):
 
 
 
+
+
+
+
+#user creation
+@app.post("/create_user")
+async def create_user(payload: schemas.CreateUser,
+    current_user: models.User = Depends(helfun.cookie_get_verify),
+    db: AsyncSession = Depends(get_db)):
+    
+    run = await helfun.create_user(payload,db)
+    
+    return run
+
+@app.put("/login")
+async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
+    '''Login and automatically creates a token and a session id'''
+    
+    jama = schemas.TokenData(**payload.model_dump())
+    
+    gama = auth.create_access_token(jama.model_dump())
+    
+    response.set_cookie(
+        key='user_access',
+        value=gama,
+        httponly=True,    
+        secure=True,     
+        samesite="lax",  
+        max_age=86400     
+    )
+    
+    return await helfun.verify_user(payload,db)
+
 @app.get("/{slug}")
 async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):
     '''The twister page. Instead of blogs you can have resume, about page, contacts and anything, sky is the limit'''
@@ -197,33 +239,3 @@ async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):
   
     
     return HTMLResponse(content=rendered_content)
-
-
-
-#user creation
-@app.post("/create_user")
-async def create_user(payload: schemas.CreateUser, db: AsyncSession = Depends(get_db)):
-    
-    run = await helfun.create_user(payload,db)
-    
-    return run
-
-@app.put("/login")
-async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
-    '''Login and automatically creates a token and a session id'''
-    
-    jama = schemas.TokenData(**payload.model_dump())
-    
-    gama = auth.create_access_token(jama.model_dump())
-    
-    response.set_cookie(
-        key='user_access',
-        value=gama,
-        httponly=True,    
-        secure=True,     
-        samesite="lax",  
-        max_age=1800     
-    )
-    
-    return await helfun.verify_user(payload,db)
-

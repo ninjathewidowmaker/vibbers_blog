@@ -3,7 +3,7 @@ from sqlalchemy import select, update, delete
 #from typing import List, Annotated, Optional
 from database import get_db, AsyncSessionLocal
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends, Cookie, Response, Request
+from fastapi import Depends, Cookie, Response, Request,HTTPException, status
 from sqlalchemy.orm import Session
 import models
 import asyncio
@@ -270,13 +270,31 @@ async def create_user(payload:schemas.CreateUser, db: AsyncSession = Depends(get
         
 async def cookie_get_verify(request: Request, db: AsyncSession = Depends(get_db)):
     '''Get token from cookie and verify it.'''
+    
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    ) 
+    
     token = request.cookies.get("user_access")
+    
+    if not token:
+        raise credentials_exception
+        
     
     verify = auth.verify_access_token(token)
     
+    if not verify:
+        raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not verify token",
+        headers={"WWW-Authenticate": "Bearer"},
+    )   
+    
     return verify
     
-#now jwt
+
     
 
 
