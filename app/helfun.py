@@ -232,6 +232,11 @@ async def get_hashed_password(username, db:AsyncSession = Depends(get_db)):
 async def verify_user(payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
     '''Get user_details and verify if the details are valid or not. NEXT: check if user has a access token, if yes
     then pass or force to login or maybe just add this if yes or no in the main.py itself.'''
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     username = payload.username
     password = payload.password
     query = (select(models.User.hashed_password)
@@ -240,14 +245,14 @@ async def verify_user(payload:schemas.VerifyUser, db: AsyncSession = Depends(get
     result = await db.execute(query)
     user_details = result.scalar()
     if user_details is None:
-        return "No user with above information is available"
+        raise credentials_exception
     
     hashed_password = user_details
     
     if not auth.verify_password(password, hashed_password):       
-        return "User is not verified"
+        raise credentials_exception
     
-    return "Success User is verified"
+    return True #Temoprary fix I should change it to something more reliable
 
 async def create_user(payload:schemas.CreateUser, db: AsyncSession = Depends(get_db)):
     '''takes user_details and returns Success message thumps up'''

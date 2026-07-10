@@ -30,6 +30,8 @@ env = Environment(
 )
 
 
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     
@@ -201,18 +203,24 @@ async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncS
     
     jama = schemas.TokenData(**payload.model_dump())
     
-    gama = auth.create_access_token(jama.model_dump())
+    confirm = await helfun.verify_user(payload,db)
     
-    response.set_cookie(
-        key='user_access',
-        value=gama,
-        httponly=True,    
-        secure=True,     
-        samesite="lax",  
-        max_age=86400     
-    )
+    if confirm:
     
-    return await helfun.verify_user(payload,db)
+      gama = auth.create_access_token(jama.model_dump())
+    
+    if gama:
+    
+      response.set_cookie(
+          key='user_access',
+          value=gama,
+          httponly=True,    
+          secure=True,     
+          samesite="lax",  
+          max_age=86400     
+      )
+    
+    return f"User with {payload.username} is verified"
 
 @app.get("/{slug}")
 async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):

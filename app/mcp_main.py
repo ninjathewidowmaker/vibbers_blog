@@ -105,7 +105,7 @@ async def delete_temp(id:int):
         
         response = await helfun.delete_temp(id, db)
         
-        return f"temp with id: {id} deleted successfully"
+        return response
     
 
 @mcp.tool(name='get_all_template_names', description = 'get all template names to assign a blog with users request')
