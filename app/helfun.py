@@ -9,17 +9,27 @@ import models
 import asyncio
 from sqlalchemy import func
 import auth
+from jinja2 import Environment, DictLoader
 #from temp_cache import template_cache
 #from main import temp_cache
 #from main import template_cache
 
 
+
 template_cache = {}
 
+env = Environment(
+    loader=DictLoader(template_cache),
+    cache_size=-1  
+)
+
 async def temp_cache(db: AsyncSession):
-    
+    '''clears old cache and re-writes new one after appending/deleting/updating/editing a template/blog'''
     query = select(models.Template.id, models.Template.page)
     result = await db.execute(query)
+    
+    if not result:
+        raise HTTPException
     
     for id, page in result.all():
         template_cache[str(id)] = page
@@ -220,7 +230,7 @@ async def get_blog_with_names(db: AsyncSession = Depends(get_db)):
 
 #IDK if this is how professionals do it? I'm just trying to do my own thing later review the code with Claude or gemini
 async def get_hashed_password(username, db:AsyncSession = Depends(get_db)):
-    '''Give a username and return a hashpassword. This is a helper function for helfun's verify_user.'''
+    '''Give a username and return a hashpassword. This is a helper function for 's verify_user.'''
     query = select(models.User.hashed_password).where(models.User.username == username)
     
     result = await db.execute(query)
@@ -293,7 +303,7 @@ async def cookie_get_verify(request: Request, db: AsyncSession = Depends(get_db)
     if not verify:
         raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not verify token",
+        detail="Please login again",
         headers={"WWW-Authenticate": "Bearer"},
     )   
     

@@ -5,7 +5,7 @@ from sqlalchemy import select, update
 from contextlib import asynccontextmanager
 #from jinja2 import Template 
 from fastapi.templating import Jinja2Templates
-from jinja2 import Environment, DictLoader
+#from jinja2 import Environment, DictLoader
 from fastapi.responses import HTMLResponse, RedirectResponse
 import asyncio
 import os
@@ -24,12 +24,9 @@ templates = Jinja2Templates(directory)
 
 
 
-env = Environment(
-    loader=DictLoader(helfun.template_cache),
-    cache_size=-1  
-)
 
 
+         
 
 
 @asynccontextmanager
@@ -82,8 +79,7 @@ async def get_blog_with_slug(request: Request, slug:str,db: AsyncSession = Depen
     query = select(models.Blog).where(models.Blog.slug == slug)
     
     result = await db.execute(query)
-  
-    
+     
     
     blog = result.scalar_one_or_none()
     
@@ -97,7 +93,7 @@ async def get_blog_with_slug(request: Request, slug:str,db: AsyncSession = Depen
     await update_views(slug, curr_views, db)
     
     try:
-        template = env.get_template(str(template_id))
+        template = helfun.env.get_template(str(template_id))
     except Exception:
         raise HTTPException(status_code=500, detail="Template not found in cache")
         
@@ -159,7 +155,7 @@ async def get_all_blogs(request: Request,st: int = 0, end: int = 12, db: AsyncSe
         helfun.get_blog_list(st=st, end=end, db=db)) 
     
     try:
-        template = env.get_template("6")
+        template = helfun.env.get_template("6")
     except Exception:
         raise HTTPException(status_code=500, detail="Blog list template not found in cache")
     
@@ -222,6 +218,8 @@ async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncS
     
     return f"User with {payload.username} is verified"
 
+
+
 @app.get("/{slug}")
 async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):
     '''The twister page. Instead of blogs you can have resume, about page, contacts and anything, sky is the limit'''
@@ -238,7 +236,7 @@ async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):
     temp_id = page.template
     
     try:
-        template = env.get_template(str(temp_id))
+        template = helfun.env.get_template(str(temp_id))
     except Exception:
         raise HTTPException(status_code=500, detail="Template not found in cache")
         
