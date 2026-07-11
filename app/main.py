@@ -98,6 +98,7 @@ async def get_blog_with_slug(request: Request, slug:str,db: AsyncSession = Depen
         raise HTTPException(status_code=500, detail="Template not found in cache")
         
     #Pending: if a new template is created it wont automatically append to the cache, only restarting the server does it
+    #Fixed: Now if a new blog/temp is inserted/edited/deleted automatically env is cleared and reloaded.
     rendered_content = template.render(post=blog)
     
     return HTMLResponse(content=rendered_content)
@@ -217,7 +218,6 @@ async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncS
       )
     
     return f"User with {payload.username} is verified"
-
 
 
 @app.get("/{slug}")

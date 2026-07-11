@@ -44,7 +44,7 @@ async def del_blog(slug:str):
         
         response = await helfun.del_blog(slug, db)
         
-        return print(response)
+        return response
     
 @mcp.tool(name='get_blog_list', description = "Get all blogs with name and slug using this tool")
 async def get_blog_list():
@@ -81,7 +81,7 @@ async def create_temp(payload: schemas.InsertTemplate):
         
         return response
     
-    
+
     
 @mcp.tool(name='edit_temp',description='edit a template')
 async def edit_temp(id:int, payload: schemas.UpdateTemplate):

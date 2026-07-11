@@ -2,13 +2,15 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt.exceptions import InvalidTokenError
+#from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+#from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
-from pydantic import BaseModel
+#from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 import asyncio
+from sqlalchemy.ext.asyncio import AsyncSession
+from database import get_db
 load_dotenv()
 
 
@@ -47,7 +49,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 
 
-def verify_access_token(token):
+def verify_access_token(token, db: AsyncSession = Depends(get_db)):
     "Pass the JWT token to check if the token is valid or not"
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

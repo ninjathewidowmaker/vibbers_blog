@@ -250,7 +250,8 @@ async def verify_user(payload:schemas.VerifyUser, db: AsyncSession = Depends(get
     username = payload.username
     password = payload.password
     query = (select(models.User.hashed_password)
-    .where(models.User.username == username, models.User.is_active == True))
+    .where(models.User.username == username,
+    models.User.is_active == True))
     
     result = await db.execute(query)
     user_details = result.scalar()
@@ -294,7 +295,7 @@ async def cookie_get_verify(request: Request, db: AsyncSession = Depends(get_db)
     
     token = request.cookies.get("user_access")
     
-    if not token:
+    if not token: 
         raise credentials_exception
         
     
@@ -305,8 +306,22 @@ async def cookie_get_verify(request: Request, db: AsyncSession = Depends(get_db)
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Please login again",
         headers={"WWW-Authenticate": "Bearer"},
-    )   
+    )
     
+    username = verify.get("username")
+    
+    if not username:
+        raise credentials_exception
+    
+    query = (select(models.User)
+    .where(models.User.username == username,models.User.is_active == True))
+    
+    in_there = await db.execute(query)
+    user = in_there.scalar_one_or_none()
+        
+    if not user:
+        raise credentials_exception
+        
     return verify
     
 
