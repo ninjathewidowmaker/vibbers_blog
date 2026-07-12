@@ -65,7 +65,7 @@ async def get_blog(slug:str):
     
     async with AsyncSessionLocal() as db:
         
-        response = await helfun.get_blogs(slug, db)
+        response = await helfun.get_blog(slug, db)
         
         return response
     
@@ -118,10 +118,10 @@ async def get_all_template_names():
             
         return response
  
-@mcp.tool(name='get_templates', description = 'Get the templates in case a user asks to edit particular template')
-async def get_templates(st: int, end:int):
+@mcp.tool(name='get_template', description = 'Get the template in case a user asks to edit particular template')
+async def get_template(id: int):
     async with AsyncSessionLocal() as db:
-       response = await helfun.get_template_list(st=st, end=end, db=db)
+       response = await helfun.get_template(id, db=db)
        return response
     
         

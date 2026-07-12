@@ -23,8 +23,14 @@ env = Environment(
     cache_size=-1  
 )
 
+def clear_env():
+    
+    return env.cache.clear()
+
 async def temp_cache(db: AsyncSession):
     '''clears old cache and re-writes new one after appending/deleting/updating/editing a template/blog'''
+    env.cache.clear()
+    template_cache.clear()
     query = select(models.Template.id, models.Template.page)
     result = await db.execute(query)
     
@@ -38,8 +44,7 @@ async def temp_cache(db: AsyncSession):
 
 
 async def create_new_blog(payload: schemas.BlogCreate, db: AsyncSession = Depends(get_db)):
-    '''I know I know I should just use x = paylod.models_dump() and y = models.BlogCreate(**x) but hey this works too why bother change?
-    '''
+    '''Creates a new blog'''
     db_blog = models.Blog(
         slug=payload.slug,
         title=payload.title,
@@ -53,13 +58,14 @@ async def create_new_blog(payload: schemas.BlogCreate, db: AsyncSession = Depend
     db.add(db_blog)
     await db.commit()
     await db.refresh(db_blog) 
+    #temp_cache(db) Blogs are fetched from the db so no need to refresh templates_cache
     
     return {"message": "Your Blog post created a successfully", "blog_id": db_blog.id}
 
 
 
 async def edit_blogs(slug:str, payload: schemas.BlogUpdate, db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+    '''give a slug as Input and get the blog'''
     db_update = select(models.Blog).where(models.Blog.slug == slug)
     
     blug = await db.execute(db_update)
@@ -99,7 +105,7 @@ async def edit_blogs(slug:str, payload: schemas.BlogUpdate, db: AsyncSession = D
 #}
 
 async def del_blog(slug:str, db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+    '''Give slug as I/P and delete the blog permanently'''
     query = delete(models.Blog).where(models.Blog.slug == slug)
     
     result = await db.execute(query)
@@ -109,7 +115,7 @@ async def del_blog(slug:str, db: AsyncSession = Depends(get_db)):
     return f"blog deleted successufully with slug: {slug}"
     
 async def create_temp(payload: schemas.InsertTemplate, db: AsyncSession = Depends(get_db)):
-    '''I used the model_dump() method here'''
+    '''Pass the payload and create a new template'''
     data = payload.model_dump()
     
     templ_data = models.Template(**data)
@@ -117,7 +123,7 @@ async def create_temp(payload: schemas.InsertTemplate, db: AsyncSession = Depend
     db.add(templ_data)
     await db.commit()
     await db.refresh(templ_data) 
-    await temp_cache(db)
+    await temp_cache(db) #Still not working
     
     #for id, page in templ_data:
     #    template_cache[str(id)] = page
@@ -125,7 +131,7 @@ async def create_temp(payload: schemas.InsertTemplate, db: AsyncSession = Depend
     return f"templated createds successufully with id:{templ_data.id}"  
 
 async def edit_temp(id:int ,payload: schemas.UpdateTemplate ,db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+    '''Pass the int as id and edit the template'''
     db_update = select(models.Template).where(models.Template.id == id)
     
     blug = await db.execute(db_update)
@@ -143,13 +149,13 @@ async def edit_temp(id:int ,payload: schemas.UpdateTemplate ,db: AsyncSession = 
      
     await db.commit()
     await db.refresh(result) 
-    await temp_cache(db)
+    await temp_cache(db)#Not working
     
     return "Successfully edites the template"
     
     
 async def delete_temp(id:int ,db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+    '''Pass the id and delete the template permanently'''
     query = delete(models.Template).where(models.Template.id == id)
     
     result = await db.execute(query)
@@ -161,19 +167,20 @@ async def delete_temp(id:int ,db: AsyncSession = Depends(get_db)):
     return f"Deleted template successfully with id: {id}"
 
 
-async def get_blogs(slug:str, db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+async def get_blog(slug:str, db: AsyncSession = Depends(get_db)):
+    '''Pass the slug and get the blog'''
     query = select(models.Blog).where(models.Blog.slug == slug)
 
     result = await db.execute(query)
     
     blog = result.scalar_one_or_none()
     
-    return blog
+    return schemas.BlogResponse.model_validate(blog).model_dump()
+    
     
 
 async def get_blog_list(st:int ,end:int, db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+    '''Get all the blogs. Pass start and end index to get particular list of blogs'''
     query = select(models.Blog).offset(st).limit(end)
     
     result = await db.execute(query)
@@ -182,18 +189,18 @@ async def get_blog_list(st:int ,end:int, db: AsyncSession = Depends(get_db)):
     
     return blogs
 
-async def get_template_list(st:int ,end:int, db: AsyncSession = Depends(get_db)):
-    '''it works too'''
-    query = select(models.Template).offset(st).limit(end)
+async def get_template(id: int, db: AsyncSession = Depends(get_db)):
+    '''Get all the templates. Pass start and end index to get particular list of templates'''
+    query = select(models.Template).where(models.Template.id == id)
     
     result = await db.execute(query)
     
-    templates = result.scalars().all()
+    templates = result.scalar_one_or_none()
     
-    return templates
+    return schemas.TemplateResponse.model_validate(templates).model_dump()
 
 async def get_blog_count(db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+    '''Get the total blog counr'''
     query = select(func.count(models.Blog.id))
     
     result = await db.execute(query)
@@ -202,7 +209,7 @@ async def get_blog_count(db: AsyncSession = Depends(get_db)):
 
 
 async def get_template_names_with_id(db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+    '''Get all templates with their name and id'''
     query = select(models.Template.id, models.Template.name)
     
     result = await db.execute(query)
@@ -213,7 +220,7 @@ async def get_template_names_with_id(db: AsyncSession = Depends(get_db)):
 
 
 async def get_blog_with_names(db: AsyncSession = Depends(get_db)):
-    '''it works too'''
+    '''Get all blogs with their name and count'''
     query = select(models.Blog.slug, models.Blog.title, models.Blog.template)
     
     result = await db.execute(query)
@@ -238,7 +245,7 @@ async def get_hashed_password(username, db:AsyncSession = Depends(get_db)):
     
     return user_details
 
-#I have to make a function which will verify the username and password and gives a goood to go signal for user to login'
+#I have to make a function which will verify the username and password and gives a goood to go signal for user to login
 async def verify_user(payload:schemas.VerifyUser, db: AsyncSession = Depends(get_db)):
     '''Get user_details and verify if the details are valid or not. NEXT: check if user has a access token, if yes
     then pass or force to login or maybe just add this if yes or no in the main.py itself.'''
@@ -323,7 +330,7 @@ async def cookie_get_verify(request: Request, db: AsyncSession = Depends(get_db)
         raise credentials_exception
         
     return verify
-    
+
 
     
 

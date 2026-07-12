@@ -66,6 +66,8 @@ class TemplateResponse(BaseModel):
     name: str
     page: str
     description: str
+    
+    model_config = ConfigDict(from_attributes=True)
        
 
 class CountBlog(BaseModel):
