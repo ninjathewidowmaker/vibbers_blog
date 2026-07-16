@@ -22,13 +22,6 @@ import auth
 directory = os.path.join(os.path.dirname(__file__), "templates")
 templates = Jinja2Templates(directory)
 
-
-
-
-
-         
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     
@@ -171,17 +164,12 @@ async def get_all_blogs(request: Request,st: int = 0, end: int = 12, db: AsyncSe
 
 
 
-@app.get("/templates", response_model=List[schemas.TemplateResponse])
-async def get_templates(st: int, end:int,db:  AsyncSession = Depends(get_db)):
-    '''I don't see why I need a templates page in the website. So no use apparently'''
-    
-    response = await helfun.get_template_list(st=st, end=end, db=db)
-    return response
-
-
-
-
-
+#@app.get("/templates", response_model=List[schemas.TemplateResponse])
+#async def get_templates(st: int, end:int,db:  AsyncSession = Depends(get_db)):
+#    '''I don't see why I need a templates page in the website. So no use apparently'''
+#    
+#    response = await helfun.get_template_list(st=st, end=end, db=db)
+#    return response
 
 
 #user creation
@@ -203,11 +191,9 @@ async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncS
     confirm = await helfun.verify_user(payload,db)
     
     if confirm:
-    
       gama = auth.create_access_token(jama.model_dump())
     
     if gama:
-    
       response.set_cookie(
           key='user_access',
           value=gama,

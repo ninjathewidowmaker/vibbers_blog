@@ -11,12 +11,14 @@ from dotenv import load_dotenv
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
+import hashlib
+import secrets
 load_dotenv()
 
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = os.getenv('ALGORITHM')
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES')
+ACCESS_TOKEN_EXPIRE_DAYS = os.getenv('ACCESS_TOKEN_EXPIRE_DAYS')
 
 
 password_hash = PasswordHash.recommended()
@@ -40,7 +42,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     to_encode = data.copy()
 
     expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(days=int(ACCESS_TOKEN_EXPIRE_MINUTES))
+        expires_delta or timedelta(days=int(ACCESS_TOKEN_EXPIRE_DAYS))
     )
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -69,3 +71,14 @@ def verify_access_token(token, db: AsyncSession = Depends(get_db)):
 #print(confirm)
 
 #Auth.py is done maybe? Now I need two to implement them in the browser with a cookie
+
+#API key generation
+def create_api_key_no_usrnme():
+    '''Creates a random str with vibbersblog in short form vb'''
+    return "vb_" + secrets.token_urlsafe(32)
+
+def hash_api_key(api_key):
+    '''creates a hash'''
+    return hashlib.sha256(api_key.encode()).hexdigest()
+
+
