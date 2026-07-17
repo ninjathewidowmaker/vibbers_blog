@@ -1,5 +1,5 @@
 import schemas
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, insert
 #from typing import List, Annotated, Optional
 from database import get_db, AsyncSessionLocal
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -331,9 +331,66 @@ async def cookie_get_verify(request: Request, db: AsyncSession = Depends(get_db)
         
     return verify
 
-
+username = 'balu_admin'
     
+async def create_MCP_api_key(request: Request, db:AsyncSession = Depends(get_db)):
+    '''Creates a api key'''
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    ) 
+    
+    token = request.cookies.get('user_access')
+    if not token: 
+        raise credentials_exception
+    
+    verify = auth.verify_access_token(token)
+    if not verify:
+        raise credentials_exception
+    
+    username = verify.get('username')
+    
+    key = auth.create_api_key_no_usrnme()
+    
+    hashed_key = auth.hash_api_key(key)
+    
+    key_with_usrname = f"{username}.{key}"
+    
+    query = (
+        select(models.User.id).where(models.User.username == username)
+    )
+    
+    result = await db.execute(query)
+        
+    id = result.scalar_one_or_none()
+    
+    if not id:
+        raise credentials_exception    
+        
+    #Temp 
+    #insert into db
+    hardcoded_details = models.APITable(
+        label='full_control',
+        user_id= id,
+        hash_key= hashed_key,
+        role= 'admin',
+    )
+    
+    db.add(hardcoded_details)
+    await db.commit()
+    await db.refresh(hardcoded_details) 
+    
+    return key_with_usrname
 
+#trend = create_MCP_api_key(username)
+
+#print(trend)
+
+def verify_api_key(api_key, db:AsyncSession = Depends(get_db)):
+    
+    return 'verified'
+    
 
 
 

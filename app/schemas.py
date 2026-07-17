@@ -108,7 +108,8 @@ class UserInDB(User):
     hashed_password: str    
     
         
-    
+#class CreateAPI(BaseModel):
+        
     
     
     

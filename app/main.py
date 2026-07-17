@@ -189,6 +189,7 @@ async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncS
     jama = schemas.TokenData(**payload.model_dump())
     
     confirm = await helfun.verify_user(payload,db)
+    gama = None
     
     if confirm:
       gama = auth.create_access_token(jama.model_dump())
@@ -205,6 +206,11 @@ async def verify_login(response:Response, payload:schemas.VerifyUser, db: AsyncS
     
     return f"User with {payload.username} is verified"
 
+@app.post("/api/create")
+async def api_key_creation(request: Request,db:AsyncSession = Depends(get_db) ):
+    
+    
+    return await helfun.create_MCP_api_key(request=request, db = db)
 
 @app.get("/{slug}")
 async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):
