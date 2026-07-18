@@ -1,9 +1,9 @@
 import schemas
 from sqlalchemy import select, update, delete, insert
-#from typing import List, Annotated, Optional
+from typing import Annotated
 from database import get_db, AsyncSessionLocal
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends, Cookie, Response, Request,HTTPException, status
+from fastapi import Depends, Cookie, Response, Request,HTTPException, status, Header
 from sqlalchemy.orm import Session
 import models
 import asyncio
@@ -331,7 +331,6 @@ async def cookie_get_verify(request: Request, db: AsyncSession = Depends(get_db)
         
     return verify
 
-username = 'balu_admin'
     
 async def create_MCP_api_key(request: Request, db:AsyncSession = Depends(get_db)):
     '''Creates a api key'''
@@ -356,23 +355,12 @@ async def create_MCP_api_key(request: Request, db:AsyncSession = Depends(get_db)
     hashed_key = auth.hash_api_key(key)
     
     key_with_usrname = f"{username}.{key}"
-    
-    query = (
-        select(models.User.id).where(models.User.username == username)
-    )
-    
-    result = await db.execute(query)
-        
-    id = result.scalar_one_or_none()
-    
-    if not id:
-        raise credentials_exception    
-        
+     
     #Temp 
     #insert into db
     hardcoded_details = models.APITable(
         label='full_control',
-        user_id= id,
+        username = username,
         hash_key= hashed_key,
         role= 'admin',
     )
@@ -386,10 +374,34 @@ async def create_MCP_api_key(request: Request, db:AsyncSession = Depends(get_db)
 #trend = create_MCP_api_key(username)
 
 #print(trend)
+#user_agent: Annotated[str | None, Header()] = None
 
-def verify_api_key(api_key, db:AsyncSession = Depends(get_db)):
+async def verify_api_key(
+    api_key: Annotated[str | None, Header(alias="vb-MCP-API-key")] = None,
+    db:AsyncSession = Depends(get_db)
+    ):
+    '''verifies if the API is valid or not'''
     
-    return 'verified'
+    if '.' not in api_key:
+        return 'error wrong API key'
+    
+    username, api_key_unhashed = api_key.split('.',1)
+    
+    key_search = auth.hash_api_key(api_key_unhashed)
+    
+    query = (
+        select(models.APITable).where(models.APITable.username == username, models.APITable.hash_key == key_search, models.APITable.is_active == True)
+    )
+    
+    result = await db.execute(query)
+    
+    verification = result.scalar_one_or_none()
+    
+    if verification:
+        return True       
+       
+       
+    return False
     
 
 

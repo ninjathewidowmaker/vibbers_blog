@@ -212,6 +212,11 @@ async def api_key_creation(request: Request,db:AsyncSession = Depends(get_db) ):
     
     return await helfun.create_MCP_api_key(request=request, db = db)
 
+@app.post("/api/verify")
+async def verify_api_key_test(api_key, db:AsyncSession = Depends(get_db)):
+    
+    return await helfun.verify_api_key(api_key,db)
+
 @app.get("/{slug}")
 async def extra_page(slug:str,db: AsyncSession = Depends(get_db)):
     '''The twister page. Instead of blogs you can have resume, about page, contacts and anything, sky is the limit'''

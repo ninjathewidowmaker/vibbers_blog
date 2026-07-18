@@ -53,8 +53,8 @@ class APITable(Base):
     __tablename__ = "api_table"
     
     id = Column(Integer, primary_key = True, autoincrement=True)
-    label = Column(String(100),nullable= False )
-    user_id = Column(Integer,nullable=False)
+    label = Column(String(100),nullable= False)
+    username = Column(String(50), nullable = False)
     hash_key = Column(String(255), unique = True, nullable=False,index=True)
     role = Column(String(50), nullable = False)
     is_active = Column(Boolean, default = True)

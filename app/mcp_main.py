@@ -4,17 +4,18 @@ import schemas
 from database import AsyncSessionLocal
 import helfun
 from typing import List
+from fastapi import Depends
 
 
 
 
-mcp = FastMCP("Blog Server") 
+mcp = FastMCP("Blog Server", auth = Depends(helfun.verify_api_key)) 
 
 
 
 
-@mcp.tool(name="create_new_blog", description="Create a new Blog post using this tool.")
-async def create_new_blog(payload: schemas.BlogCreate):
+@mcp.tool(name="create_new_blog",description="Create a new Blog post using this tool.")
+async def create_new_blog(payload: schemas.BlogCreate ):
     """Creates a new blog post. And also If user asks for a specific template you can check it using the
     get_template tool otherwise template 1 would be default"""
     
