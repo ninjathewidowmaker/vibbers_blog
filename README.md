@@ -89,7 +89,10 @@ To hook VibbersBlog up to your development agent (like Claude Desktop, cursor, o
   "mcpServers": {
     "vibbers_blog": {
       "transport": "streamable-http",
-      "url": "http://localhost:6767/mcp"
+      "url": "http://localhost:6767/mcp",
+      "headers": {
+        "vb-mcp-api-key": "your_api_key"
+      }
     }
   }
 }
@@ -99,19 +102,6 @@ Alternatively, paste the snippet above into your workspace chat window and instr
 
 > _"Register this HTTP MCP server to access my website database and templates."_
 
-See [app/mcp_connect.py](file:///C:/Users/balum/Desktop/opinions/app/mcp_connect.py) for a boilerplate implementation on how to connect programmatically using LangChain.
+See [app/mcp_connect.py](/app/mcp_connect.py) for a boilerplate implementation on how to connect programmatically using LangChain.
 
 ---
-
-## ! Security Notice
-
-> [!CAUTION]
-> **Do not deploy this in production as-is.**
-> Out of the box, this application has **no authentication layers** guarding either the frontend routes or the raw MCP control socket. Anyone who locates your endpoints can modify your site database. Before deploying to public servers, make sure to add JWT, API Key, or Basic auth middlewares to lock down the endpoints.
-
----
-
-## What's Next? (v2 Roadmap)
-
-- Add native JWT OAuth2 authentication.
-- Role-based access control for tools.
