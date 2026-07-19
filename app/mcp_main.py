@@ -4,18 +4,39 @@ import schemas
 from database import AsyncSessionLocal
 import helfun
 from typing import List
-from fastapi import Depends
+from fastapi import Request, HTTPException
+from fastmcp.dependencies import Depends, CurrentRequest
+from fastmcp.server.dependencies import get_http_request
 
 
 
 
-mcp = FastMCP("Blog Server", auth = Depends(helfun.verify_api_key)) 
+mcp = FastMCP("Blog Server") 
+
+async def accept_api(request: Request = CurrentRequest()):
+    '''picks api key from headers and verifies using helfun's verify_api_key fun'''
+    
+    api_key = request.headers.get('vb-mcp-api-key')
+    
+    if not api_key:
+        raise HTTPException(status_code=401, detail='you are not authorised without API key')
+    
+    async with AsyncSessionLocal() as db:
+        response = await helfun.verify_api_key(api_key, db)
+    
+    if not response:
+        raise HTTPException(status_code=401, detail='invalid API key')
+    
+    return api_key
+            
+    
+    
 
 
 
 
 @mcp.tool(name="create_new_blog",description="Create a new Blog post using this tool.")
-async def create_new_blog(payload: schemas.BlogCreate ):
+async def create_new_blog(payload: schemas.BlogCreate,accept_api:str = Depends(accept_api) ):
     """Creates a new blog post. And also If user asks for a specific template you can check it using the
     get_template tool otherwise template 1 would be default"""
     

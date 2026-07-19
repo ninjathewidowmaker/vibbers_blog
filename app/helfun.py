@@ -377,7 +377,7 @@ async def create_MCP_api_key(request: Request, db:AsyncSession = Depends(get_db)
 #user_agent: Annotated[str | None, Header()] = None
 
 async def verify_api_key(
-    api_key: Annotated[str | None, Header(alias="vb-MCP-API-key")] = None,
+    api_key,
     db:AsyncSession = Depends(get_db)
     ):
     '''verifies if the API is valid or not'''

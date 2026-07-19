@@ -6,7 +6,7 @@ from alembic import context
 
 
 from app.database import DATABASE_URL
-from app.models import Base, Blog, Template  
+from app.models import Base, Blog, Template, User, APITable  
 
 
 config = context.config
