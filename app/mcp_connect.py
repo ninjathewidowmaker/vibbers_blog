@@ -12,7 +12,10 @@ async def main():
         {
             "vibbers_blog": {
                 "transport": "streamable-http",
-                "url": "http://localhost:6969/mcp"
+                "url": "http://localhost:6969/mcp",
+                "headers": {
+                  "vb-mcp-api-key": "your_api_key"
+                 }
             }
         } 
     )
