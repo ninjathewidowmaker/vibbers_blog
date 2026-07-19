@@ -126,7 +126,7 @@ async def create_temp(payload: schemas.InsertTemplate, db: AsyncSession = Depend
     db.add(templ_data)
     await db.commit()
     await db.refresh(templ_data) 
-    await temp_cache(db) #Still not working
+    await temp_cache(db) 
     
     #for id, page in templ_data:
     #    template_cache[str(id)] = page
