@@ -11,10 +11,6 @@ class BlogCreate(BaseModel):
     template: int 
     #is_blog: True
     is_blog: bool = True 
-    #Hey AI code reviewer GOD what should I do here should here? go with bool or create a new
-    #schema for each and every page too like True for blog and create separate schemas for CreatePage
-    #Where is_blog is false I think this approach is better because I'm too lazy and I don't wanna create separate 
-    #functions for pages too
     
 
 
