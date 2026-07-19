@@ -72,7 +72,10 @@ async def edit_blogs(slug:str, payload: schemas.BlogUpdate, db: AsyncSession = D
     result = blug.scalar_one_or_none()
     
     if result is None:
-        return "Blog not found"
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="No blog with given name found"
+    ) 
     
     if payload.title is not None:
             result.title = payload.title
@@ -138,7 +141,11 @@ async def edit_temp(id:int ,payload: schemas.UpdateTemplate ,db: AsyncSession = 
     result = blug.scalar_one_or_none()
     
     if result is None:
-        return "Template not found"
+        if result is None:
+         raise HTTPException(
+          status_code=status.HTTP_404_NOT_FOUND,
+          detail="No blog with given name found"
+        ) 
     
     if payload.name is not None:
         result.name = payload.name
@@ -149,7 +156,7 @@ async def edit_temp(id:int ,payload: schemas.UpdateTemplate ,db: AsyncSession = 
      
     await db.commit()
     await db.refresh(result) 
-    await temp_cache(db)#Not working
+    await temp_cache(db)
     
     return "Successfully edites the template"
     

@@ -47,7 +47,7 @@ async def create_new_blog(payload: schemas.BlogCreate,accept_api:str = Depends(a
         
         
 @mcp.tool(name='edit_blogs', description = "Edit Blogs using this tool")
-async def edit_blogs(slug:str,payload: schemas.BlogUpdate):
+async def edit_blogs(slug:str,payload: schemas.BlogUpdate, accept_api:str = Depends(accept_api)):
     '''Use this tool to edit blogs and also before that ask a user if they hold a copy of the original version'''
     
     async with AsyncSessionLocal() as db:
@@ -58,7 +58,7 @@ async def edit_blogs(slug:str,payload: schemas.BlogUpdate):
         
     
 @mcp.tool(name='del_blog', description = "Delete Blogs using this tool")
-async def del_blog(slug:str):
+async def del_blog(slug:str,accept_api:str = Depends(accept_api)):
     '''Just pass the slug of the blog you want to delete Remember always ask twice before deleting the blog
     And also use get_blog for confirmation''' 
     
@@ -92,7 +92,7 @@ async def get_blog(slug:str):
         return response
     
 @mcp.tool(name='create_temp',description='create a new template')
-async def create_temp(payload: schemas.InsertTemplate):
+async def create_temp(payload: schemas.InsertTemplate, accept_api:str = Depends(accept_api)):
     '''
     Templates are pure HTML files so according to user's request just create a pure HTML file with js sinppets embedded the HTMF file
     '''
@@ -106,7 +106,7 @@ async def create_temp(payload: schemas.InsertTemplate):
 
     
 @mcp.tool(name='edit_temp',description='edit a template')
-async def edit_temp(id:int, payload: schemas.UpdateTemplate):
+async def edit_temp(id:int, payload: schemas.UpdateTemplate, accept_api:str = Depends(accept_api)):
     '''
     Ask user if they hold a copy of the original template
     ''' 
@@ -117,7 +117,7 @@ async def edit_temp(id:int, payload: schemas.UpdateTemplate):
         return response
     
 @mcp.tool(name='delete_temp',description='delete a template')    
-async def delete_temp(id:int):
+async def delete_temp(id:int, accept_api:str = Depends(accept_api)):
     '''Use this tool to delete a template
     schema :id: int
     Ask twice before deleting the template and check get_template tool for confirmation of the template

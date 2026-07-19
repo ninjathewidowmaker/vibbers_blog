@@ -124,8 +124,6 @@ async def delete_blog(slug:str,
 
 @app.get("/")
 async def home_page(request: Request):
-        
-        
    return RedirectResponse(url="/home", status_code=307)
     
 
@@ -140,7 +138,7 @@ async def home_page(request: Request):
 #    return {"cache_contents": template_cache}
  
  
-@app.get("/blogs", response_model=schemas.CountBlog)
+@app.get("/blogs")
 async def get_all_blogs(request: Request,st: int = 0, end: int = 12, db: AsyncSession = Depends(get_db)):
     '''This feature doesn't have a page LOL. But for future purpose I need this'''
     
@@ -175,7 +173,6 @@ async def get_all_blogs(request: Request,st: int = 0, end: int = 12, db: AsyncSe
 #user creation
 @app.post("/create_user")
 async def create_user(payload: schemas.CreateUser,
-    current_user: models.User = Depends(helfun.cookie_get_verify),
     db: AsyncSession = Depends(get_db)):
     
     run = await helfun.create_user(payload,db)
